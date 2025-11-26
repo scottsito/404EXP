@@ -38,7 +38,7 @@
     </header>
     <main class="main-content">
         <section class="hero">
-            <h1>Welcome to the Hub</h1>
+            <h1>Welcome to My games hub</h1>
             <p class="lead">Play, explore, and enjoy a curated collection of small games and projects.</p>
             <div class="hero-cta">
                 <a class="btn-primary" href="src/g/LG-Hub-main/index.html">Browse Multigames</a>
@@ -107,7 +107,14 @@
                         <strong>Iframer!</strong>
                         <small>bypass goguardian with this simple iframer!</small>
                     </div>
+                    <a class="game-card" href="src/g/page4.html">
+                        <img src="src/Assets/iframe.png" alt="Youtube">
+                        <div class="game-card-body">
+                            <strong>Noahs tutoring!</strong>
+                            <small>Didint have enought time to throw this tg!</small>
+                        </div>
         </section>
+        <a class="else"></a>
         <section class="about">
             <h2>About this site</h2>
             <p>Hello! This site is a request that i've been getting from people, so i brought it to life!</p>
@@ -123,8 +130,117 @@
                 <li><strong>2025-10-01</strong>: Added CookieClicker improvements.</li>
                 <li><strong>2025-09-12</strong>: New Multigames hub imported.</li>
             </ul>
+
+            <!-- Update UI: checks a remote manifest and allows downloading an update package.
+                 Note: Browsers cannot overwrite local files automatically. This will download the
+                 update (zip) so the user can replace their local copy, or a local server can
+                 be used to apply updates programmatically. See script below for configuration. -->
+            <div id="update-root" style="margin-top:1rem;">
+                <button id="checkUpdatesBtn" class="btn-primary">Check for updates</button>
+                <span id="updateStatus" style="margin-left:0.6rem;">Not checked yet</span>
+                <div id="updateInfo" style="margin-top:0.6rem; display:none;">
+                    <div id="remoteVersion"></div>
+                    <div id="updateNotes" style="margin-top:0.3rem; color:#333"></div>
+                    <div style="margin-top:0.5rem;">
+                        <button id="downloadUpdateBtn" class="btn-secondary" style="display:none;">Download
+                            update</button>
+                        <a id="manualLink" style="margin-left:0.6rem; display:none;">Manual instructions</a>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 </body>
+
+<script>
+    // Simple updater logic
+    (function () {
+        // Current installed version (update this when you ship a release). You can also store this in a file.
+        const CURRENT_VERSION = localStorage.getItem('siteVersion') || '2025-10-16';
+
+        // URL where you host a JSON manifest describing the latest release. Example manifest:
+        // {
+        //   "version": "2025-10-24",
+        //   "notes": "Minor fixes and new game added.",
+        //   "downloadUrl": "https://example.com/404exp/updates/404exp-2025-10-24.zip"
+        // }
+        // Replace the placeholder with your real manifest URL before publishing.
+        const MANIFEST_URL = '';
+
+        const qs = id => document.getElementById(id);
+        const checkBtn = qs('checkUpdatesBtn');
+        const status = qs('updateStatus');
+        const info = qs('updateInfo');
+        const rv = qs('remoteVersion');
+        const notes = qs('updateNotes');
+        const downloadBtn = qs('downloadUpdateBtn');
+
+        function fmtVersion(v) { return v; }
+
+        async function checkUpdates() {
+            status.textContent = 'Checking...';
+            try {
+                const res = await fetch(MANIFEST_URL, { cache: 'no-store' });
+                if (!res.ok) throw new Error('Manifest fetch failed: ' + res.status);
+                const manifest = await res.json();
+                info.style.display = '';
+                rv.textContent = 'Remote version: ' + fmtVersion(manifest.version);
+                notes.textContent = manifest.notes || '';
+
+                // Compare versions (simple string/date compare works if you use ISO dates)
+                if (manifest.version && manifest.version !== CURRENT_VERSION) {
+                    status.textContent = 'Update available';
+                    downloadBtn.style.display = '';
+                    downloadBtn.onclick = () => downloadUpdate(manifest.downloadUrl, manifest.version);
+                } else {
+                    status.textContent = 'Up to date';
+                    downloadBtn.style.display = 'none';
+                }
+            } catch (err) {
+                console.error(err);
+                status.textContent = 'Update check failed';
+                notes.textContent = String(err);
+                info.style.display = '';
+                downloadBtn.style.display = 'none';
+            }
+        }
+
+        async function downloadUpdate(url, version) {
+            if (!url) {
+                alert('No download URL provided in manifest.');
+                return;
+            }
+            status.textContent = 'Downloading...';
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('Download failed: ' + res.status);
+                const blob = await res.blob();
+                // Trigger a save as dialog so the user can overwrite their local copy.
+                const filename = `404exp-update-${version}.zip`;
+                const a = document.createElement('a');
+                const objUrl = URL.createObjectURL(blob);
+                a.href = objUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(objUrl);
+
+                status.textContent = 'Downloaded — check your browser downloads folder';
+                // Optionally remember the remote version locally (so next run knows).
+                localStorage.setItem('siteVersion', version);
+            } catch (err) {
+                console.error(err);
+                status.textContent = 'Download failed';
+                alert('Failed to download update: ' + err.message);
+            }
+        }
+
+        checkBtn.addEventListener('click', () => checkUpdates());
+
+        // Auto-check on load if desired (commented out by default)
+        // window.addEventListener('load', checkUpdates);
+    })();
+</script>
 
 </html>
