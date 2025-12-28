@@ -2,60 +2,80 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Pro Euchre - Trick Tracking & Bowers</title>
+    <title>Pro Euchre - Full Bidding & Fixed Deal</title>
     <style>
-        :root { --green: #1a5d1a; --gold: #fbff00; --wood: #3e2723; --paper: #f4ecd8; }
+        :root { --green: #1a5d1a; --gold: #fbff00; --wood: #3e2723; }
         body { font-family: 'Segoe UI', sans-serif; background: #0a2f0a; color: white; margin: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
         
         #game-world { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
-        /* Scoring and Trick Count */
+        #turn-tracker { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.85); padding: 15px; border-radius: 10px; border-left: 5px solid var(--gold); min-width: 160px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
+        .turn-label { font-size: 0.7rem; opacity: 0.6; letter-spacing: 1px; }
+        .turn-name { font-weight: bold; color: var(--gold); display: block; margin-top: 4px; font-size: 1.1rem; }
+
         .ui-top { position: absolute; top: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 100; }
-        .score-display { display: flex; gap: 40px; }
-        .trick-count-box { background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 10px; border: 1px solid var(--gold); display: flex; gap: 20px; font-weight: bold; font-size: 1.1rem; }
+        .score-display { display: flex; gap: 40px; align-items: center; }
+        .trick-count-box { background: rgba(0,0,0,0.7); padding: 6px 18px; border-radius: 20px; border: 1px solid var(--gold); display: flex; gap: 15px; font-size: 0.9rem; font-weight: bold; }
         
         .score-track { display: flex; flex-direction: column; align-items: center; }
-        .card-stack { position: relative; width: 60px; height: 90px; }
-        .score-card { position: absolute; width: 60px; height: 90px; background: white; border-radius: 5px; color: black; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem; border: 1px solid #333; transition: transform 0.6s; }
-        .red-text { color: #d32f2f; }
+        .card-stack { position: relative; width: 50px; height: 75px; }
+        .score-card { position: absolute; width: 50px; height: 75px; background: white; border-radius: 5px; color: black; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; border: 1px solid #333; }
 
-        /* Table */
-        #table { position: relative; width: 650px; height: 450px; background: var(--green); border-radius: 220px; border: 10px solid var(--wood); box-shadow: inset 0 0 60px rgba(0,0,0,0.7); }
-        #dealer-button { position: absolute; width: 40px; height: 40px; background: white; border-radius: 50%; color: black; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid #333; transition: all 0.8s; z-index: 10; font-size: 0.8rem; }
+        .player-label { position: absolute; font-size: 0.8rem; color: rgba(255,255,255,0.7); background: rgba(0,0,0,0.5); padding: 3px 12px; border-radius: 12px; pointer-events: none; border: 1px solid rgba(255,255,255,0.1); }
+        .label-0 { bottom: 140px; left: 50%; transform: translateX(-50%); }
+        .label-1 { left: 40px; top: 40%; transform: translateY(-50%); }
+        .label-2 { top: 140px; left: 50%; transform: translateX(-50%); }
+        .label-3 { right: 40px; top: 40%; transform: translateY(-50%); }
+
+        #table { position: relative; width: 650px; height: 450px; background: var(--green); border-radius: 220px; border: 10px solid var(--wood); box-shadow: inset 0 0 80px rgba(0,0,0,0.8); }
+        #dealer-button { position: absolute; width: 35px; height: 35px; background: white; border-radius: 50%; color: black; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid #333; transition: 0.8s; z-index: 10; font-size: 0.7rem; }
         
-        #kitty-container { position: absolute; right: -150px; top: 50%; transform: translateY(-50%); transition: all 0.8s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        #kitty-container { position: absolute; right: -150px; top: 50%; transform: translateY(-50%); transition: 0.8s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
         #kitty-container.active { right: 30px; }
-        #kitty-container.removed { right: -250px; opacity: 0; }
 
-        /* Cards */
-        .card { width: 75px; height: 110px; background: white; color: black; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; border: 1px solid #777; box-shadow: 2px 2px 8px rgba(0,0,0,0.4); transition: all 0.5s; font-size: 1.2rem; pointer-events: none; }
+        .card { width: 75px; height: 110px; background: white; color: black; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; border: 1px solid #777; box-shadow: 2px 4px 10px rgba(0,0,0,0.5); transition: 0.3s; font-size: 1.2rem; pointer-events: none; }
         .card.red { color: #d32f2f; }
-        .card.back { background: #b71c1c; border: 4px solid white; }
+        .card.back { 
+            background: #b71c1c; 
+            border: 4px solid white;
+            background-image: radial-gradient(circle, #ffffff 1px, transparent 1px);
+            background-size: 10px 10px;
+        }
         .card.playable { pointer-events: auto; cursor: pointer; }
-        .card.playable:hover { transform: translateY(-20px); border-color: var(--gold); }
+        .card.playable:hover { transform: translateY(-15px); border-color: var(--gold); z-index: 100; }
+
+        #ui-overlay { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); z-index: 200; text-align: center; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+        #ui-overlay.visible { opacity: 1; pointer-events: auto; }
+        .msg { font-size: 1.6rem; color: var(--gold); text-shadow: 2px 2px 8px black; background: rgba(0,0,0,0.9); padding: 20px 40px; border-radius: 15px; border: 2px solid var(--gold); }
+        button { padding: 12px 24px; background: var(--gold); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 5px; box-shadow: 0 4px 0 #b7950b; }
+
+        #trophy-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
 
         .hand { position: absolute; bottom: 20px; display: flex; gap: 10px; height: 120px; z-index: 20; }
-        .slot { position: absolute; width: 75px; height: 110px; border: 2px dashed rgba(255,255,255,0.2); border-radius: 8px; }
+        .slot { position: absolute; width: 75px; height: 110px; border: 2px dashed rgba(255,255,255,0.05); border-radius: 8px; }
         .slot-0 { bottom: 30px; left: 50%; transform: translateX(-50%); } 
         .slot-1 { left: 40px; top: 50%; transform: translateY(-50%); }   
         .slot-2 { top: 30px; left: 50%; transform: translateX(-50%); }    
         .slot-3 { right: 40px; top: 50%; transform: translateY(-50%); }  
-        .slot.hidden { opacity: 0; }
-
-        #ui-overlay { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); z-index: 100; text-align: center; pointer-events: none; }
-        #controls { pointer-events: auto; margin-top: 20px; display: flex; flex-direction: column; gap: 5px; }
-        .msg { font-size: 1.8rem; color: var(--gold); text-shadow: 2px 2px 8px black; background: rgba(0,0,0,0.6); padding: 10px 25px; border-radius: 15px; min-width: 300px; }
-        button { padding: 10px 20px; background: var(--gold); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #b7950b; }
-        .trump-icon { font-size: 3rem; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
 <div id="game-world">
+    <div id="turn-tracker">
+        <span class="turn-label">CURRENT TURN</span>
+        <span id="active-turn-name" class="turn-name">Welcome</span>
+    </div>
+
+    <div id="trophy-screen">
+        <h1 id="winner-text" style="color:var(--gold); font-size: 3rem;">TEAM US WINS!</h1>
+        <button onclick="location.reload()">New Game</button>
+    </div>
+
     <div class="ui-top">
         <div class="score-display">
-            <div class="score-track"><div>US</div><div class="card-stack"><div class="score-card bottom red-text">6</div><div class="score-card top red-text" id="us-4">4</div></div></div>
-            <div id="trump-indicator" class="trump-icon"></div>
+            <div class="score-track"><div>US</div><div class="card-stack"><div class="score-card bottom" style="color:#d32f2f">6</div><div class="score-card top" id="us-4" style="color:#d32f2f">4</div></div></div>
+            <div id="trump-indicator" style="font-size: 2.5rem; width: 40px; text-align: center;"></div>
             <div class="score-track"><div>THEM</div><div class="card-stack"><div class="score-card bottom">6</div><div class="score-card top" id="them-4">4</div></div></div>
         </div>
         <div class="trick-count-box">
@@ -64,14 +84,20 @@
         </div>
     </div>
 
-    <div id="ui-overlay">
-        <div id="message" class="msg">EUCHRE</div>
-        <div id="controls"><button onclick="startGame()">Start Game</button></div>
+    <div id="ui-overlay" class="visible">
+        <div id="message" class="msg">PRO EUCHRE</div>
+        <div id="controls"><button onclick="initGame()">Start Game</button></div>
     </div>
 
     <div id="table">
         <div id="dealer-button">D</div>
         <div id="kitty-container"><div class="card back"></div><div id="up-card-slot"></div></div>
+        
+        <div class="player-label label-0">You</div>
+        <div class="player-label label-1" id="name-1">Bot 1</div>
+        <div class="player-label label-2" id="name-2">Partner</div>
+        <div class="player-label label-3" id="name-3">Bot 3</div>
+
         <div class="slot slot-0" id="target-0"></div>
         <div class="slot slot-1" id="target-1"></div>
         <div class="slot slot-2" id="target-2"></div>
@@ -82,64 +108,91 @@
 </div>
 
 <script>
+    const NAMES = ["Arthur", "Beatrice", "Winston", "Florence", "George", "Clara", "Harold", "Edith", "Reginald", "Mabel"];
     const SUITS = ['♠', '♣', '♥', '♦'], RANKS = ['9', '10', 'J', 'Q', 'K', 'A'];
     const COLORS = { '♠': 'black', '♣': 'black', '♥': 'red', '♦': 'red' };
     const SAME_COLOR = { '♠': '♣', '♣': '♠', '♥': '♦', '♦': '♥' };
 
-    let deck = [], playerHand = [], bots = [[],[],[]];
+    let deck = [], playerHand = [], bots = [[],[],[]], botNames = [];
     let trumpSuit = null, leadSuit = null, upCard = null;
     let scores = [0, 0], trickCounts = [0, 0], dealer = 0, turn = 0;
-    let tableCards = [], lonePlayer = null;
+    let tableCards = [], lonePlayer = null, isDiscarding = false, bidRound = 1;
+
+    function updateMsg(txt) {
+        const overlay = document.getElementById('ui-overlay');
+        document.getElementById('message').innerText = txt;
+        txt === "" ? overlay.classList.remove('visible') : overlay.classList.add('visible');
+    }
+
+    function updateTurnTracker(custom) {
+        if (custom) { document.getElementById('active-turn-name').innerText = custom; return; }
+        const names = ["Your Turn", botNames[0], botNames[1], botNames[2]];
+        document.getElementById('active-turn-name').innerText = names[turn] || "...";
+    }
 
     function getCardPower(card, trump, lead) {
         if (!trump) return 0;
         if (card.rank === 'J' && card.suit === trump) return 100;
         if (card.rank === 'J' && card.suit === SAME_COLOR[trump]) return 95;
         if (card.suit === trump) return RANKS.indexOf(card.rank) + 20;
-        if (lead && card.suit === lead) return RANKS.indexOf(card.rank) + 10;
+        if (lead && (card.rank === 'J' && card.suit === SAME_COLOR[trump] ? trump : card.suit) === lead) return RANKS.indexOf(card.rank) + 10;
         return RANKS.indexOf(card.rank);
     }
 
-    function getEffectiveSuit(card, trump) {
-        if (card.rank === 'J' && card.suit === SAME_COLOR[trump]) return trump;
-        return card.suit;
-    }
-
-    function updateScoreCards() {
-        document.getElementById('us-4').style.transform = `translateX(${(scores[0]%10) * 12}px) rotate(${(scores[0]%10) * 5}deg)`;
-        document.getElementById('them-4').style.transform = `translateX(-${(scores[1]%10) * 12}px) rotate(-${(scores[1]%10) * 5}deg)`;
+    function updateScoreDisplay() {
+        document.getElementById('us-4').style.transform = `translateX(${(scores[0]%10) * 10}px) rotate(${(scores[0]%10) * 4}deg)`;
+        document.getElementById('them-4').style.transform = `translateX(-${(scores[1]%10) * 10}px) rotate(-${(scores[1]%10) * 4}deg)`;
         document.getElementById('tricks-us').innerText = trickCounts[0];
         document.getElementById('tricks-them').innerText = trickCounts[1];
+        if (scores[0] >= 10 || scores[1] >= 10) document.getElementById('trophy-screen').style.display = 'flex';
     }
 
-    function startGame() { scores = [0, 0]; dealer = 0; updateScoreCards(); nextRound(); }
+    function initGame() {
+        scores = [0, 0]; dealer = 0;
+        let shuffled = [...NAMES].sort(() => 0.5 - Math.random());
+        botNames = [shuffled[0], shuffled[1], shuffled[2]];
+        document.getElementById('name-1').innerText = botNames[0];
+        document.getElementById('name-2').innerText = botNames[1] + " (P)";
+        document.getElementById('name-3').innerText = botNames[2];
+        updateScoreDisplay(); nextRound();
+    }
 
-    function nextRound() {
-        trickCounts = [0, 0]; tableCards = []; leadSuit = null; lonePlayer = null;
-        updateScoreCards();
+    async function nextRound() {
+        trickCounts = [0, 0]; tableCards = []; leadSuit = null; lonePlayer = null; isDiscarding = false; bidRound = 1;
         document.getElementById('played-cards-area').innerHTML = '';
-        document.getElementById('kitty-container').className = 'active';
-        document.getElementById('target-2').classList.remove('hidden');
+        document.getElementById('player-hand').innerHTML = '';
+        document.getElementById('up-card-slot').innerHTML = '';
+        document.getElementById('trump-indicator').innerText = "";
+        document.getElementById('target-2').style.opacity = '1';
         
         const pos = [{ b: "15px", l: "50%" }, { l: "15px", t: "50%" }, { t: "15px", l: "50%" }, { r: "15px", t: "50%" }];
         const btn = document.getElementById('dealer-button');
-        Object.assign(btn.style, { bottom: pos[dealer].b || 'auto', top: pos[dealer].t || 'auto', left: pos[dealer].l || 'auto', right: pos[dealer].r || 'auto' });
+        Object.assign(btn.style, { bottom: pos[dealer].b||'auto', top: pos[dealer].t||'auto', left: pos[dealer].l||'auto', right: pos[dealer].r||'auto' });
 
+        updateTurnTracker("Shuffling...");
         deck = []; SUITS.forEach(s => RANKS.forEach(r => deck.push({ rank: r, suit: s })));
         deck.sort(() => Math.random() - 0.5);
         playerHand = deck.splice(0, 5); bots = [deck.splice(0, 5), deck.splice(0, 5), deck.splice(0, 5)];
         upCard = deck.splice(0, 1)[0];
+
+        for (let i = 0; i < 4; i++) await dealAnim(i);
         
+        document.getElementById('kitty-container').className = 'active';
+        document.getElementById('up-card-slot').appendChild(createCardEl(upCard));
         renderHand();
-        const slot = document.getElementById('up-card-slot');
-        slot.innerHTML = ''; slot.appendChild(createCardEl(upCard));
-        
-        updateMsg("Call Trump?");
-        document.getElementById('controls').innerHTML = `
-            <button onclick="confirmTrump('${upCard.suit}', false)">Order Up</button>
-            <button onclick="confirmTrump('${upCard.suit}', true)" style="background:#ff9800">Go Alone</button>
-            <button onclick="confirmTrump('${SUITS.find(s=>s!==upCard.suit)}', false)">Pass</button>
-        `;
+        turn = (dealer + 1) % 4;
+        startBidding();
+    }
+
+    function dealAnim(pIdx) {
+        return new Promise(res => {
+            const el = createCardEl({}, true);
+            const dBtn = document.getElementById('dealer-button').getBoundingClientRect();
+            const tab = document.getElementById('table').getBoundingClientRect();
+            Object.assign(el.style, { position: 'absolute', top: (dBtn.top - tab.top)+'px', left: (dBtn.left - tab.left)+'px', zIndex: '60', transition: 'all 0.3s' });
+            document.getElementById('played-cards-area').appendChild(el);
+            setTimeout(() => { el.style.opacity = '0'; setTimeout(() => { el.remove(); res(); }, 100); }, 50);
+        });
     }
 
     function createCardEl(card, isBack = false) {
@@ -154,21 +207,85 @@
         container.innerHTML = '';
         playerHand.forEach((card, i) => {
             const el = createCardEl(card);
-            if (!playableCards || playableCards.includes(card)) {
-                el.classList.add('playable'); el.onclick = () => playToTable(i);
+            if (isDiscarding || !playableCards || playableCards.includes(card)) {
+                el.classList.add('playable'); el.onclick = () => isDiscarding ? discard(i) : playToTable(i);
             }
             container.appendChild(el);
         });
     }
 
+    function startBidding() {
+        updateTurnTracker();
+        if (turn === 0) {
+            updateMsg(bidRound === 1 ? "Order Up Up-Card?" : "Call a Suit?");
+            let btns = "";
+            if (bidRound === 1) {
+                btns = `<button onclick="confirmTrump('${upCard.suit}', false)">Order Up</button>
+                        <button onclick="confirmTrump('${upCard.suit}', true)" style="background:#ff9800">Alone</button>
+                        <button onclick="passBid()">Pass</button>`;
+            } else {
+                SUITS.filter(s => s !== upCard.suit).forEach(s => {
+                    btns += `<button onclick="confirmTrump('${s}', false)">${s}</button>`;
+                });
+                btns += `<button onclick="passBid()">Pass</button>`;
+            }
+            document.getElementById('controls').innerHTML = btns;
+        } else {
+            setTimeout(botBid, 800);
+        }
+    }
+
+    function botBid() {
+        let hand = bots[turn-1];
+        let trumps = hand.filter(c => c.suit === (bidRound === 1 ? upCard.suit : "")); // Simple AI
+        if (trumps.length >= 3) {
+            confirmTrump(bidRound === 1 ? upCard.suit : SUITS.find(s=>s!==upCard.suit), false);
+        } else {
+            passBid();
+        }
+    }
+
+    function passBid() {
+        updateMsg(turn === 0 ? "You Passed" : `${botNames[turn-1]} Passed`);
+        setTimeout(() => {
+            turn = (turn + 1) % 4;
+            if (turn === (dealer + 1) % 4) {
+                if (bidRound === 1) {
+                    bidRound = 2;
+                    document.getElementById('up-card-slot').innerHTML = '<div class="card back" style="opacity:0.3"></div>';
+                    startBidding();
+                } else {
+                    updateMsg("Everyone Passed. Redealing...");
+                    setTimeout(nextRound, 1500);
+                }
+            } else {
+                startBidding();
+            }
+        }, 600);
+    }
+
     function confirmTrump(suit, alone) {
         trumpSuit = suit;
-        if (alone) { lonePlayer = 0; document.getElementById('target-2').classList.add('hidden'); }
+        if (alone) { lonePlayer = 0; document.getElementById('target-2').style.opacity = '0.2'; }
         document.getElementById('trump-indicator').innerText = suit;
         document.getElementById('controls').innerHTML = '';
         document.getElementById('kitty-container').className = 'removed';
-        turn = (dealer + 1) % 4;
-        startTrick();
+        
+        if (bidRound === 1) {
+            if (dealer === 0) {
+                isDiscarding = true; updateMsg("Pick a card to discard"); renderHand();
+            } else {
+                if (dealer > 0) bots[dealer-1].splice(0, 1, upCard);
+                updateMsg(""); turn = (dealer + 1) % 4; startTrick();
+            }
+        } else {
+            updateMsg(""); turn = (dealer + 1) % 4; startTrick();
+        }
+    }
+
+    function discard(idx) {
+        playerHand.splice(idx, 1, upCard);
+        isDiscarding = false; updateMsg(""); renderHand([]); turn = (dealer + 1) % 4; startTrick();
     }
 
     function startTrick() { tableCards = []; leadSuit = null; processTurn(); }
@@ -176,81 +293,60 @@
     function processTurn() {
         if (tableCards.length === (lonePlayer !== null ? 3 : 4)) { setTimeout(resolveTrick, 800); return; }
         if (turn === 2 && lonePlayer === 0) { turn = (turn + 1) % 4; processTurn(); return; }
-
+        updateTurnTracker();
         if (turn === 0) {
-            updateMsg("Your Turn");
-            let legal = playerHand.filter(c => getEffectiveSuit(c, trumpSuit) === leadSuit);
-            if (legal.length === 0) legal = playerHand;
-            renderHand(legal);
-        } else { setTimeout(botAIPlay, 600); }
+            let legal = playerHand.filter(c => {
+                let s = c.rank === 'J' && c.suit === SAME_COLOR[trumpSuit] ? trumpSuit : c.suit;
+                return s === leadSuit;
+            });
+            renderHand(legal.length ? legal : playerHand);
+        } else { setTimeout(botAIPlay, 800); }
     }
 
     function botAIPlay() {
-        let hand = bots[turn - 1];
-        let legal = hand.filter(c => getEffectiveSuit(c, trumpSuit) === leadSuit);
-        if (legal.length === 0 || !leadSuit) legal = hand;
-        
-        let bestOnTable = tableCards.length > 0 ? Math.max(...tableCards.map(tc => getCardPower(tc.card, trumpSuit, leadSuit))) : -1;
-        let winners = legal.filter(c => getCardPower(c, trumpSuit, leadSuit) > bestOnTable);
-        let chosen = winners.length > 0 ? 
-            winners.reduce((prev, curr) => getCardPower(curr, trumpSuit, leadSuit) < getCardPower(prev, trumpSuit, leadSuit) ? curr : prev) :
-            legal.reduce((prev, curr) => getCardPower(curr, trumpSuit, leadSuit) < getCardPower(prev, trumpSuit, leadSuit) ? curr : prev);
-
-        bots[turn - 1] = hand.filter(c => c !== chosen);
-        if (!leadSuit) leadSuit = getEffectiveSuit(chosen, trumpSuit);
+        let hand = bots[turn-1];
+        let legal = hand.filter(c => {
+            let s = c.rank === 'J' && c.suit === SAME_COLOR[trumpSuit] ? trumpSuit : c.suit;
+            return !leadSuit || s === leadSuit;
+        });
+        let chosen = legal[0];
+        bots[turn-1] = hand.filter(c => c !== chosen);
+        if (!leadSuit) leadSuit = chosen.rank === 'J' && chosen.suit === SAME_COLOR[trumpSuit] ? trumpSuit : chosen.suit;
         tableCards.push({ card: chosen, player: turn });
         animateMove(chosen, turn);
         turn = (turn + 1) % 4;
         processTurn();
     }
 
-    function playToTable(index) {
-        const card = playerHand.splice(index, 1)[0];
-        if (!leadSuit) leadSuit = getEffectiveSuit(card, trumpSuit);
+    function playToTable(idx) {
+        const card = playerHand.splice(idx, 1)[0];
+        if (!leadSuit) leadSuit = card.rank === 'J' && card.suit === SAME_COLOR[trumpSuit] ? trumpSuit : card.suit;
         tableCards.push({ card, player: 0 });
-        animateMove(card, 0);
-        renderHand([]);
-        turn = (turn + 1) % 4;
-        processTurn();
+        animateMove(card, 0); renderHand([]); turn = (turn + 1) % 4; processTurn();
     }
 
-    function animateMove(card, playerIdx) {
-        const area = document.getElementById('played-cards-area'), cardEl = createCardEl(card);
-        const target = document.getElementById(`target-${playerIdx}`).getBoundingClientRect();
-        const table = document.getElementById('table').getBoundingClientRect();
-        const startPos = [{ t: 600, l: 325 }, { t: 225, l: -100 }, { t: -100, l: 325 }, { t: 225, l: 700 }];
-        Object.assign(cardEl.style, { position: 'absolute', top: startPos[playerIdx].t + 'px', left: startPos[playerIdx].l + 'px' });
-        area.appendChild(cardEl);
-        setTimeout(() => { cardEl.style.top = (target.top - table.top) + 'px'; cardEl.style.left = (target.left - table.left) + 'px'; }, 50);
+    function animateMove(card, pIdx) {
+        const el = createCardEl(card);
+        const tar = document.getElementById(`target-${pIdx}`).getBoundingClientRect();
+        const tab = document.getElementById('table').getBoundingClientRect();
+        Object.assign(el.style, { position: 'absolute', top: (tar.top - tab.top)+'px', left: (tar.left - tab.left)+'px' });
+        document.getElementById('played-cards-area').appendChild(el);
     }
 
     function resolveTrick() {
-        let winner = tableCards.reduce((prev, curr) => getCardPower(curr.card, trumpSuit, leadSuit) > getCardPower(prev.card, trumpSuit, leadSuit) ? curr : prev);
-        let teamWinner = (winner.player % 2 === 0) ? 0 : 1;
-        trickCounts[teamWinner]++;
-        
-        const names = ["You", "Bot 1", "Bot 2", "Bot 3"];
-        updateMsg(`${names[winner.player]} takes the trick!`);
-        updateScoreCards();
-
+        let winner = tableCards.reduce((a, b) => getCardPower(a.card, trumpSuit, leadSuit) > getCardPower(b.card, trumpSuit, leadSuit) ? a : b);
+        trickCounts[(winner.player % 2 === 0) ? 0 : 1]++;
+        updateMsg((winner.player === 0 ? "You" : botNames[winner.player-1]) + " took the trick!");
+        updateScoreDisplay();
         setTimeout(() => {
-            document.getElementById('played-cards-area').innerHTML = '';
+            updateMsg(""); document.getElementById('played-cards-area').innerHTML = '';
             if (playerHand.length === 0) {
-                let usTricks = trickCounts[0];
-                if (usTricks >= 3) {
-                    scores[0] += (usTricks === 5) ? (lonePlayer === 0 ? 4 : 2) : 1;
-                } else {
-                    scores[1] += 2; // Euchred
-                }
-                updateScoreCards();
-                dealer = (dealer + 1) % 4;
-                updateMsg(scores[0] >= 10 ? "YOU WIN GAME!" : "Round Over");
-                setTimeout(nextRound, 1500);
+                if (trickCounts[0] >= 3) scores[0] += (trickCounts[0] === 5 ? (lonePlayer === 0 ? 4 : 2) : 1);
+                else scores[1] += 2;
+                updateScoreDisplay(); dealer = (dealer + 1) % 4; setTimeout(nextRound, 1000);
             } else { turn = winner.player; startTrick(); }
-        }, 1200);
+        }, 1000);
     }
-
-    function updateMsg(txt) { document.getElementById('message').innerText = txt; }
 </script>
 </body>
 </html>
