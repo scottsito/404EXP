@@ -1,16 +1,18 @@
 
+/* Ported theme from oak-and-fire.github.io */
 :root {
-  --bg-dark: #e3b2ed;
-  --text-dark: #3f3c37;
-  --accent: #ffaedc;
+  --bg-dark: #232024;
+  --text-dark: #ffffff;
+  --accent: #0e0d0d;
+  --panel: rgba(24, 22, 24, 0.78);
+  --panel-2: rgba(46, 43, 46, 0.72);
+  --border: rgba(255, 255, 255, 0.10);
+  --border-2: rgba(255, 255, 255, 0.16);
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+  --radius: 14px;
+  --maxw: 980px;
 }
-button {
-  background-color:  #e3b2ed;
-  color: white;
-  padding: 16px;
-  font-size: 16px;
-  border: none;
-}
+
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
@@ -20,48 +22,55 @@ body {
   transition: background-color 0.4s, color 0.4s;
   position: relative;
   overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Better base typography */
+h1, h2, h3 {
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+p {
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0 0 12px;
+}
+
+ul {
+  margin: 10px 0 18px;
+  padding-left: 20px;
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
+  margin: 22px 0;
 }
 
 
 .about a {
- display: block;
-  background: #c891c9;
-  border: 1px solid #f4b5f9;
+  display: block;
+  background: #0a090a;
+  border: 1px solid #1d1b1d;
   border-radius: 10px;
   padding: 15px;
   margin-bottom: 15px;
   text-decoration: none;
-  color: var(--text-dark)
+  color: var(--text-dark);
 }
 
 header {
   position: relative; /* allow absolutely positioned controls inside */
   text-align: center;
-  padding: 40px 20px;
-  background-color: #c891c9;
-  border: none;
-  border-radius: 0;
-}
-
-/* Logo in the left of the header */
-#navbar {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 3;
-  display: flex;
-  align-items: center;
-}
-
-.logo { 
-  width: 410px; 
-  height: 57px; 
-  object-fit: contain; 
-  border-radius: 0; 
-  border: none; 
-  background: transparent; 
-  display: block; 
+  padding: 44px 18px 22px;
+  margin: 18px auto 18px;
+  max-width: var(--maxw);
+  background: linear-gradient(180deg, rgba(24, 22, 24, 0.88), rgba(24, 22, 24, 0.58));
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 6px);
+  box-shadow: var(--shadow);
+  color: var(--text-dark);
 }
 
 /* Centered header title */
@@ -70,24 +79,79 @@ header {
   z-index: 2;
   font-size: 34px;
   font-weight: 700;
-  color: #f7a2ff;
+  color: var(--text-dark);
   margin: 0 auto;
   line-height: 1;
   padding-top: 8px;
-  text-shadow: 0 2px 6px rgba(224, 82, 224, 0.253);
-  letter-spacing: 1px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.35);
+  letter-spacing: -0.02em;
   font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  background: linear-gradient(90deg, rgba(244, 201, 255, 0.95), rgba(255, 144, 218, 0.7));
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 nav a {
-  margin: 0 15px;
-  color: var(--accent);
+  display: inline-block;
+  margin: 10px 8px 0;
+  padding: 10px 12px;
   text-decoration: none;
   font-weight: bold;
+  color: var(--text-dark);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+nav a:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.10);
+  border-color: var(--border-2);
+}
+
+nav a:focus-visible {
+  outline: 2px solid rgba(20, 216, 204, 0.75);
+  outline-offset: 2px;
+}
+
+/* Buttons (usable anywhere, not only hero) */
+.btn-primary,
+.btn-secondary,
+button.btn-primary,
+button.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.10);
+  color: var(--text-dark);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-secondary,
+button.btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.btn-primary:hover,
+.btn-secondary:hover,
+button.btn-primary:hover,
+button.btn-secondary:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: var(--border-2);
+}
+
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+button.btn-primary:focus-visible,
+button.btn-secondary:focus-visible {
+  outline: 2px solid rgba(20, 216, 204, 0.75);
+  outline-offset: 2px;
 }
 
 .project-list a {
@@ -104,8 +168,9 @@ nav a {
 footer {
   text-align: center;
   padding: 20px;
-  background-color: #c891c9;
-  color: var(--accent);
+  background-color: #1b1a1b;
+  color: var(--text-dark);
+  border-top: 1px solid var(--border);
 }
 
 #bg-canvas {
@@ -115,7 +180,11 @@ footer {
   width: 100%;
   height: 100%;
   z-index: -1;
-  background: #e5abe6;
+  background:
+    radial-gradient(900px 500px at 10% 10%, rgba(20, 216, 204, 0.10), transparent 55%),
+    radial-gradient(900px 500px at 90% 30%, rgba(193, 130, 17, 0.08), transparent 55%),
+    radial-gradient(1000px 700px at 50% 90%, rgba(255, 255, 255, 0.04), transparent 60%),
+    #0b0a0c;
   pointer-events: none;
 }
 
@@ -127,6 +196,26 @@ footer {
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Card-like sections (oak-and-fire baseline) */
+section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 22px;
+  margin: 16px 0;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+}
+
+/* Respect users/devices that prefer less motion/effects */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .fade-in {
@@ -141,109 +230,27 @@ html {
     transform: translateY(0);
   }
 }
-/* Dropdown Button */
-.dropbtn {
-  background-color: #e3b2ed;
-  color: white;
-  padding: 16px;
-  font-size: 16px;
-  border: none;
-}
-
-/* The container <div> - needed to position the dropdown content */
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-/* Dropdown Content (Hidden by Default) */
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f1f1f1;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-}
-
-/* Links inside the dropdown */
-.dropdown-content a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-/* Change color of dropdown links on hover */
-.dropdown-content a:hover {background-color: #ddd;}
-
-/* Show the dropdown menu on hover */
-.dropdown:hover .dropdown-content {display: block;}
-
-/* Change the background color of the dropdown button when the dropdown content is shown */
-.dropdown:hover .dropbtn {background-color: #d0a1da;}
-
-/* Header control buttons: change color on hover like the dropdown button */
-.header-controls .dropbtn:hover,
-.header-controls button:hover {
-  background-color: #d0a1da;
-  transition: background-color 0.15s ease;
-  cursor: pointer;
-}
-
-/* Header controls container - places buttons and dropdown at top-right of header */
-.header-controls {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  z-index: 2;
-}
-
-/* Make header controls smaller and fit nicely */
-.header-controls .dropbtn,
-.header-controls button {
-  padding: 14px 22px;
-  font-size: 18px;
-  border-radius: 8px;
-}
-
-/* Responsive: stack controls under header on narrow screens */
+/* Responsive */
 @media (max-width: 600px) {
-  .header-controls {
-    position: static;
-    justify-content: center;
-    margin-top: 12px;
-    flex-wrap: wrap;
-  }
-  header { padding-top: 20px; }
-  /* shrink logo and title on small screens */
-  .logo { width: 240px; height: 34px; }
+  header { padding-top: 28px; }
   .header-title { font-size: 20px; }
-  /* slightly smaller buttons for mobile so they fit */
-  .header-controls .dropbtn,
-  .header-controls button {
-    padding: 10px 14px;
-    font-size: 15px;
-  }
   /* Responsive grid: 1 column on small screens */
   .games-grid,
   .games-grid.small-grid { grid-template-columns: 1fr; }
 }
- iframe {
-      margin: 0;
-      border: none;
-      width: 100%;
-      height: 100%;
-      margin-top: auto;
-    }
-    /* Main container */
+iframe {
+  display: block;
+  margin: 0;
+  border: none;
+  width: 100%;
+  height: 90vh;
+}
+
+/* Main container */
 .main-content {
-  max-width: 1100px;
-  margin: 28px auto;
-  padding: 0 18px 48px;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 18px 16px 60px;
   color: var(--text-dark);
 }
 
@@ -251,8 +258,8 @@ html {
 .hero {
   background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
   padding: 36px 20px;
-  border-radius: 6px;
-  margin-bottom: 22px;
+  border-radius: var(--radius);
+  margin-bottom: 16px;
   text-align: center;
 }
 .hero h1 {
@@ -267,23 +274,17 @@ html {
 }
 .hero-cta .btn-primary,
 .hero-cta .btn-secondary {
-  display: inline-block;
   margin: 6px 8px;
-  padding: 12px 18px;
-  border-radius: 8px;
-  text-decoration: none;
-  color: #fff;
-  background: #d16bcf;
+  display: inline-flex;
 }
 .hero-cta .btn-secondary {
-  background: #e3b2ed;
-  color: #222;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* Games grid */
 .games-section h2 {
   margin: 8px 0 14px;
-  color: #fff;
+  color: var(--text-dark);
 }
 .games-grid {
   display: grid;
@@ -295,17 +296,19 @@ html {
 }
 .game-card {
   display: block;
-  background: rgba(255,255,255,0.04);
-  border-radius: 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   overflow: hidden;
   text-decoration: none;
   color: var(--text-dark);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
 }
 .game-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+  border-color: var(--border-2);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.34);
 }
 .game-card img {
   width: 100%;
@@ -317,5 +320,5 @@ html {
   padding: 10px 12px;
   background: linear-gradient(180deg, rgba(0,0,0,0.02), transparent);
 }
-.game-card-body strong { display:block; color:#fff; margin-bottom:4px; }
+.game-card-body strong { display:block; color: var(--text-dark); margin-bottom:4px; }
 .game-card-body small { color: rgba(255,255,255,0.8); }

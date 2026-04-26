@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <!--stole half of this from that rowen dude lol-->
 
 <head>
@@ -7,6 +7,7 @@
     <title>Home</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
     <meta name="description" content="Welcome to the Home Page">
     <meta name="keywords" content="home, welcome, main page">
     <link rel="icon" href="src/Assets/favicon.png" type="image/png">
@@ -14,12 +15,7 @@
 
 <body>
     <canvas id="bg-canvas"></canvas>
-    <script src="script.js"></script>
     <header>
-        <div id="navbar">
-            <img src="src/Assets/logo.png" alt="Site logo" class="logo">
-        </div>
-
         <div class="header-title">Welcome to [[404EXP!]]</div>
 
     </header>
@@ -28,7 +24,7 @@
             <h1>Welcome to My games hub</h1>
             <p class="lead">Play, explore, and enjoy a curated collection of small games and projects.</p>
             <div class="hero-cta">
-                <a class="btn-primary" href="src/g/LG-Hub-main/index.html">Browse Multigames</a>
+                <a class="btn-primary" href="src/calculus/LG-Hub-main/index.html">Browse Multigames</a>
                 <a class="btn-secondary" href="#games">See Featured Games</a>
             </div>
         </section>
@@ -84,23 +80,27 @@
                     <img src="src/Assets/iframe.png" alt="Youtube">
                     <div class="game-card-body">
                         <strong>Iframer!</strong>
-                        <small>bypass goguardian with this simple iframer!</small>
+                        <small>Go to (almost) any website with this simple iframer!</small>
                     </div>
-                    <a class="game-card" href="src/g/page4.html">
-                        <img src="src/Assets/iframe.png" alt="Youtube">
-                        <div class="game-card-body">
-                            <strong>Noahs tutoring!</strong>
-                            <small>Didint have enought time to throw this tg!</small>
-                        </div>
+                </a>
+
+                <a class="game-card" href="src/Noahs/Noahs-Calculus-Tutor/index.html">
+                    <img src="src/Assets/iframe.png" alt="Youtube">
+                    <div class="game-card-body">
+                        <strong>Noahs tutoring!</strong>
+                        <small>Didint have enought time to throw this tg!</small>
+                    </div>
+                </a>
+            </div>
         </section>
-        <a class="else"></a>
-        <section class="about">
+        <!-- spacer -->
+        <section class="about" id="about">
             <h2>About this site</h2>
             <p>Hello! This site is a request that i've been getting from people, so i brought it to life!</p>
             <small>WARNING: if you get in trouble then this is not my responsibility</small>
 <strong>Faye sucks</strong>
         </section>
-        <section class="updates main-content">
+        <section class="updates">
             <h2>Latest updates</h2>
             <ul>
                 <li><strong>2025-10-16</strong>: Header — added left logo and centered site title; restyled header
@@ -132,6 +132,7 @@
     </main>
 </body>
 
+<script src="script.js"></script>
 <script>
     // Simple updater logic
     (function () {
