@@ -211,7 +211,7 @@ if (nintendoBtn) {
   nintendoBtn.addEventListener("click", (e) => {
     e.preventDefault();
 
-    const url = "http://education.calculustutor.xyz/GBA2.0";
+    const url = "https://education.calculustutor.xyz/GBA2.0";
     const iconData =
       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACVElEQVR4Ae3WA4ycURiF4TVr27ZtIyijBrVtu0HtRrVt27bttRln32xOkjXv3Whv8mTmar4zM78cErULoW3xD+EI0+sMzdXDL8QiOoko+OAGZqEGnBwy29jUF0FYgon4jPWaa4cQrMEwjEhgNBbhOH7gG5aiVFYC/EJlOOMKNiYI8B+NE6x3jKemPZUxF7/wEC1MB2ik/nDNX8QujEN1OGm+Pq7hC9rYCLAPP7AX1+GDP1iB4lpTGhfwHJVMBziIXXrvhloqHqB9VTRXHe+xDS4mA+zHXfRCeThKN3zDZRTT2iHa28JkgAX4Ax8VnAlvzfVEAJaoXwiPscpkAG+UQ30sU8Fl2ueIdfiZ4K9YikfIZyZAgqaC4/EPzTXWHEEYon4v/EA14wE0XwQvMSvBz/4Gm9SvpwCtbAVwxUWsUd8Tt3FQ/Sr4gva2AhTFS0xRPy+eYKf6NfHVzi/A1Q9T8RP1NVZV6+eo3xHfUN3UWVAIddAaa+CnEI6aH40QtFV/Mh4jv6kA8+GrsecYCnfNVcBrnIYnPHABG01eByqjJ1qiSJJj4RD+obXGuuI3OmiVtbOgJS4jAIM0Xkifsx/uJn+BOlo/EJNxXIWfozcc4YE1+IR6xu6GcFTBGPzGZ5zHGJTU+oJYjX/oZ/R5AE6au4RKKAoXrXNHJ1zGd/SHo5UAUhN1VXQyLsAHJ5IeL6b/giOIxh/8lXfYgZ7wSrOWgYOwOnpJZzRAsfh9ahYDpN1sBsgNkBvgX04HuIT7mIJt8LcdoA2uoiQcsSHBPd8HT1DZZMk4aZKFX5jHAcMAAAAASUVORK5CYII=";
 
@@ -220,8 +220,12 @@ if (nintendoBtn) {
     if (nintendoWin && !nintendoWin.closed) {
       nintendoWin.focus();
     } else {
-      nintendoWin = window.open();
-      if (!nintendoWin) return; // popup blocked
+      nintendoWin = window.open("", "_blank");
+      if (!nintendoWin) {
+        // popup blocked: fall back to the built-in wrapper page
+        window.location.href = "src/calculus/page2.html";
+        return;
+      }
 
       // Set Tab Title
       nintendoWin.document.title = "Home | Schoology";
